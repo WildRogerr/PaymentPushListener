@@ -15,22 +15,22 @@ import android.util.Base64
 class PaymentPushListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        if (sbn.packageName != "ru.sberbankmobile") return
-        val extras = sbn.notification.extras ?: return
-        val text = extras.getCharSequence("android.text")?.toString() ?: return
-        val amount = parseAmount(text) ?: return
+        try {
+            if (sbn.packageName != "ru.sberbankmobile") return
+            val extras = sbn.notification.extras ?: return
+            val text = extras.getCharSequence("android.text")?.toString() ?: return
+            val amount = parseAmount(text) ?: return
 
-        val event = PaymentEvent(
-            amount = amount,
-            timestamp = nowEpoch()
-        )
+            val event = PaymentEvent(amount, nowEpoch())
+            val json = Gson().toJson(event)
+            val prefs = getSharedPreferences("config", MODE_PRIVATE)
+            val aesKey = prefs.getString("aes_key", "1234567890123456") ?: "1234567890123456"
+            val encryptedJson = encrypt(json, aesKey)
+            sendToServer(encryptedJson, serverUrlFromPrefs())
 
-        val json = Gson().toJson(event)
-
-        val prefs = getSharedPreferences("config", MODE_PRIVATE)
-        val aesKey = prefs.getString("aes_key", "1234567890123456") ?: "1234567890123456"
-        val encryptedJson = encrypt(json, aesKey)
-        sendToServer(encryptedJson, serverUrlFromPrefs())
+        } catch (e: Exception) {
+            Log.e("PaymentPushListener", "Error processing notification", e)
+        }
     }
 
     private fun parseAmount(text: String): Long? {
@@ -85,10 +85,15 @@ class PaymentPushListener : NotificationListenerService() {
     }
 
     private fun encrypt(json: String, key: String): String {
-        val secretKey = SecretKeySpec(key.toByteArray(), "AES")
-        val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-        val encrypted = cipher.doFinal(json.toByteArray())
-        return Base64.encodeToString(encrypted, Base64.NO_WRAP)
+        return try {
+            val secretKey = SecretKeySpec(key.toByteArray(), "AES")
+            val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            val encrypted = cipher.doFinal(json.toByteArray())
+            Base64.encodeToString(encrypted, Base64.NO_WRAP)
+        } catch (e: Exception) {
+            Log.e("Encrypt", "Encryption failed", e)
+            json
+        }
     }
 }

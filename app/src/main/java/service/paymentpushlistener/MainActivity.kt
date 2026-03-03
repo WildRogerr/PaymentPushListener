@@ -2,6 +2,7 @@ package service.paymentpushlistener
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -19,7 +20,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
 
         editServer = findViewById(R.id.editServer)
         btnSave = findViewById(R.id.btnSave)
@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("config", MODE_PRIVATE)
         updateCurrentServer(prefs.getString("server_url", "-") ?: "-")
         updateCurrentKey(enKey = prefs.getString("aes_key", "-") ?: "-")
+
+        checkNotificationAccess()
 
         btnSave.setOnClickListener {
             val url = editServer.text.toString().trim()
@@ -60,5 +62,19 @@ class MainActivity : AppCompatActivity() {
     }
     private fun updateCurrentKey(enKey: String) {
         currentKey.text = "Current Encryption Key: $enKey"
+    }
+    private fun checkNotificationAccess() {
+        val enabledListeners = Settings.Secure.getString(
+            contentResolver,
+            "enabled_notification_listeners"
+        ) ?: ""
+        if (!enabledListeners.contains(packageName)) {
+            Toast.makeText(
+                this,
+                "Notification access required. Please enable for this app.",
+                Toast.LENGTH_LONG
+            ).show()
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
     }
 }
