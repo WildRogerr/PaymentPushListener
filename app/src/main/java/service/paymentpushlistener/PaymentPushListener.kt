@@ -2,6 +2,7 @@ package service.paymentpushlistener
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.util.Base64
 import android.util.Log
 import com.google.gson.Gson
 import okhttp3.*
@@ -10,41 +11,50 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
-import android.util.Base64
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 class PaymentPushListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        val pkg = sbn.packageName
+        val extras = sbn.notification.extras ?: return
+        val text = extras.getCharSequence("android.text")?.toString() ?: return
+
+        val bank = "ru.sberbankmobile"
+
+        if (pkg != bank) return
+
+        val amount = parseAmount(text) ?: return
+
+        val event = PaymentEvent(
+            amount = amount,
+            timestamp = System.currentTimeMillis()
+        )
+        val json = Gson().toJson(event)
+        val prefs = getSharedPreferences("config", MODE_PRIVATE)
+        val key = prefs.getString("aes_key", "1234567890123456") ?: "1234567890123456"
+        val encrypted = encrypt(json, key)
+        val url = prefs.getString("server_url", "") ?: ""
+
+        sendToServer(encrypted, url)
+    }
+
+    private fun parseAmount(text: String?): Long? {
+        if (text.isNullOrEmpty()) return null
         try {
-            if (sbn.packageName != "ru.sberbankmobile") return
-            val extras = sbn.notification.extras ?: return
-            val text = extras.getCharSequence("android.text")?.toString() ?: return
-            val amount = parseAmount(text) ?: return
-
-            val event = PaymentEvent(amount, nowEpoch())
-            val json = Gson().toJson(event)
-            val prefs = getSharedPreferences("config", MODE_PRIVATE)
-            val aesKey = prefs.getString("aes_key", "1234567890123456") ?: "1234567890123456"
-            val encryptedJson = encrypt(json, aesKey)
-            sendToServer(encryptedJson, serverUrlFromPrefs())
-
+            val cleaned = text.replace("[\\s\u00A0]".toRegex(), "")
+            val regex = Regex("(\\d+[.,]?\\d*)\\s*₽")
+            val match = regex.find(cleaned) ?: return null
+            val valueStr = match.groupValues[1].replace(",", ".")
+            val value = valueStr.toDouble()
+            val ret = (value * 100).toLong()
+            return ret
         } catch (e: Exception) {
-            Log.e("PaymentPushListener", "Error processing notification", e)
+            Log.e("PARSE", "Failed to parse amount", e)
+            return null
         }
-    }
-
-    private fun parseAmount(text: String): Long? {
-        val cleaned = text.replace(" ", "")
-        val regex = Regex("(\\d+[.,]?\\d*)₽")
-        val match = regex.find(cleaned) ?: return null
-        val value = match.groupValues[1]
-            .replace(",", ".")
-            .toDouble()
-        return (value * 100).toLong()
-    }
-
-    private fun nowEpoch(): Long {
-        return System.currentTimeMillis()
     }
 
     data class PaymentEvent(
@@ -52,48 +62,53 @@ class PaymentPushListener : NotificationListenerService() {
         val timestamp: Long
     )
 
-    private fun sendToServer(json: String, serverUrl: String, retries: Int = 3) {
+    private fun encrypt(json: String, key: String): String {
+        return try {
+            val secretKey = SecretKeySpec(key.toByteArray(), "AES")
+            val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            Base64.encodeToString(cipher.doFinal(json.toByteArray()), Base64.NO_WRAP)
+        } catch (e: Exception) {
+            Log.e("ENCRYPT", "Error encrypting", e)
+            json
+        }
+    }
+
+    private fun sendToServer(json: String, serverUrl: String) {
         if (serverUrl.isBlank()) {
-            Log.e("HTTP", "Server URL is empty, skipping send")
+            Log.e("HTTP", "Server URL empty, skipping send")
             return
         }
 
-        val client = OkHttpClient()
+        val client = unsafeClient()//val client = OkHttpClient()
         val body = json.toRequestBody("application/json".toMediaType())
         val request = Request.Builder().url(serverUrl).post(body).build()
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("HTTP", "Send failed", e)
-                if (retries > 0) {
-                    android.os.Handler(mainLooper).postDelayed({
-                        sendToServer(json, serverUrl, retries - 1)
-                    }, 5000)
-                }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.d("HTTP", "Response: ${response.code}")
+                Log.d("HTTP", "Response code: ${response.code}")
                 response.close()
             }
         })
     }
 
-    fun serverUrlFromPrefs(): String {
-        val prefs = getSharedPreferences("config", MODE_PRIVATE)
-        return prefs.getString("server_url", "") ?: ""
-    }
-
-    private fun encrypt(json: String, key: String): String {
-        return try {
-            val secretKey = SecretKeySpec(key.toByteArray(), "AES")
-            val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-            val encrypted = cipher.doFinal(json.toByteArray())
-            Base64.encodeToString(encrypted, Base64.NO_WRAP)
-        } catch (e: Exception) {
-            Log.e("Encrypt", "Encryption failed", e)
-            json
-        }
+    fun unsafeClient(): OkHttpClient {
+        val trustAll = arrayOf<TrustManager>(
+            object : X509TrustManager {
+                override fun checkClientTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {}
+                override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {}
+                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> = arrayOf()
+            }
+        )
+        val sslContext = SSLContext.getInstance("SSL")
+        sslContext.init(null, trustAll, java.security.SecureRandom())
+        return OkHttpClient.Builder()
+            .sslSocketFactory(sslContext.socketFactory, trustAll[0] as X509TrustManager)
+            .hostnameVerifier { _, _ -> true }
+            .build()
     }
 }

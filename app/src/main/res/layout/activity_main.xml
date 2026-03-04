@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rootLayout"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/rootLayout"
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
+	<TextView
+		android:id="@+id/textView"
+		android:layout_width="335dp"
+		android:layout_height="63dp"
+		android:autoSizeTextType="uniform"
+		android:text="Payment Push Listener"
+		android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+	<TextView
+		android:id="@+id/textView2"
+		android:layout_width="match_parent"
+		android:layout_height="43dp"
+		android:text="Settings:"
+		android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+	<EditText
         android:id="@+id/editServer"
         android:hint="Server URL"
         android:layout_width="match_parent"
@@ -18,6 +34,20 @@
 		android:hint="Encryption Key (16 chars)"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"/>
+		
+	<EditText
+        android:id="@+id/editMinAmount"
+        android:hint="Min amount (₽)"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/editMaxAmount"
+        android:hint="Max amount (₽)"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/btnSave"
@@ -40,4 +70,27 @@
 		android:paddingTop="16dp"
 		android:text="Current Encryption Key: -"
 		android:textSize="16sp" />
+		
+	<TextView
+		android:id="@+id/currentMinAmount"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingTop="16dp"
+		android:text="Current min amount: -"
+		android:textSize="16sp" />
+
+	<TextView
+		android:id="@+id/currentMaxAmount"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingTop="16dp"
+		android:text="Current max amount: -"
+		android:textSize="16sp" />
+
+	<Button
+		android:id="@+id/btnNotif"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Enable notification access" />
+
 </LinearLayout>

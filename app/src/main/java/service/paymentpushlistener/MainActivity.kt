@@ -22,59 +22,62 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         editServer = findViewById(R.id.editServer)
-        btnSave = findViewById(R.id.btnSave)
-        currentServer = findViewById(R.id.currentServer)
         editKey = findViewById(R.id.editKey)
+        currentServer = findViewById(R.id.currentServer)
         currentKey = findViewById(R.id.currentKey)
-
+        btnSave = findViewById(R.id.btnSave)
 
         val prefs = getSharedPreferences("config", MODE_PRIVATE)
-        updateCurrentServer(prefs.getString("server_url", "-") ?: "-")
-        updateCurrentKey(enKey = prefs.getString("aes_key", "-") ?: "-")
 
-        checkNotificationAccess()
+        updateCurrentServer(prefs.getString("server_url", "-") ?: "-")
+        updateCurrentKey(prefs.getString("aes_key", "-") ?: "-")
 
         btnSave.setOnClickListener {
             val url = editServer.text.toString().trim()
+            val key = editKey.text.toString().trim()
+
             if (url.isNotEmpty()) {
                 prefs.edit().putString("server_url", url).apply()
-                editServer.text.clear()
-                Toast.makeText(this, "Server saved!", Toast.LENGTH_SHORT).show()
                 updateCurrentServer(url)
-            } else {
-                Toast.makeText(this, "Enter a valid server URL", Toast.LENGTH_SHORT).show()
             }
 
-            val key = editKey.text.toString().trim()
             if (key.length == 16) {
                 prefs.edit().putString("aes_key", key).apply()
-                editKey.text.clear()
-                Toast.makeText(this, "Encryption key saved!", Toast.LENGTH_SHORT).show()
                 updateCurrentKey(key)
-            } else {
+            } else if (key.isNotEmpty()) {
                 Toast.makeText(this, "Key must be 16 characters", Toast.LENGTH_SHORT).show()
             }
+
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         }
+
+        if (!hasNotificationAccess()) {
+            Toast.makeText(
+                this,
+                "Notification access is disabled. Please enable it.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        findViewById<Button>(R.id.btnNotif).setOnClickListener {
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
+    }
+
+    private fun hasNotificationAccess(): Boolean {
+        val enabled = Settings.Secure.getString(
+            contentResolver,
+            "enabled_notification_listeners"
+        ) ?: return false
+
+        return enabled.contains(packageName)
     }
 
     private fun updateCurrentServer(url: String) {
         currentServer.text = "Current server: $url"
     }
+
     private fun updateCurrentKey(enKey: String) {
         currentKey.text = "Current Encryption Key: $enKey"
-    }
-    private fun checkNotificationAccess() {
-        val enabledListeners = Settings.Secure.getString(
-            contentResolver,
-            "enabled_notification_listeners"
-        ) ?: ""
-        if (!enabledListeners.contains(packageName)) {
-            Toast.makeText(
-                this,
-                "Notification access required. Please enable for this app.",
-                Toast.LENGTH_LONG
-            ).show()
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        }
     }
 }
