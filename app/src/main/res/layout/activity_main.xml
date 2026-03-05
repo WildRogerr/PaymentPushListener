@@ -1,96 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/rootLayout"
-    android:orientation="vertical"
-    android:padding="16dp"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#BFD3BF"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-	<TextView
-		android:id="@+id/textView"
-		android:layout_width="335dp"
-		android:layout_height="63dp"
-		android:autoSizeTextType="uniform"
-		android:text="Payment Push Listener"
-		android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="348dp"
+        android:layout_height="60dp"
+        android:autoSizeTextType="uniform"
+        android:text="Payment Push Listener"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#3C503C"
+        android:textStyle="bold"
+        tools:text="Payment Push Listener" />
 
-	<TextView
-		android:id="@+id/textView2"
-		android:layout_width="match_parent"
-		android:layout_height="43dp"
-		android:text="Settings:"
-		android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:text="Settings:"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-	<EditText
+    <EditText
         android:id="@+id/editServer"
-        android:hint="Server URL"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-		
-	<EditText
-		android:id="@+id/editKey"
-		android:hint="Encryption Key (16 chars)"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"/>
-		
-	<EditText
+        android:layout_height="wrap_content"
+        android:hint="Server URL" />
+
+    <EditText
+        android:id="@+id/editKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Encryption Key (16 chars)" />
+
+    <EditText
         android:id="@+id/editMinAmount"
-        android:hint="Min amount (₽)"
-        android:inputType="numberDecimal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:hint="Min amount (₽)"/>
 
     <EditText
         android:id="@+id/editMaxAmount"
-        android:hint="Max amount (₽)"
-        android:inputType="numberDecimal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:hint="Max amount (₽)"/>
+
+    <CheckBox
+        android:id="@+id/cbSber"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:buttonTint="@color/material_dynamic_neutral30"
+        android:minHeight="56dp"
+        android:padding="6dp"
+        android:text="Сбербанк"
+        android:textSize="18sp" />
+
+    <CheckBox
+        android:id="@+id/cbTbank"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:buttonTint="@color/material_dynamic_neutral30"
+        android:minHeight="56dp"
+        android:padding="6dp"
+        android:text="Т-Банк"
+        android:textSize="18sp" />
+
+    <CheckBox
+        android:id="@+id/cbAlpha"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:buttonTint="@color/material_dynamic_neutral30"
+        android:minHeight="56dp"
+        android:padding="6dp"
+        android:text="Альфа Банк"
+        android:textSize="18sp" />
+
+    <CheckBox
+        android:id="@+id/cbVTB"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:buttonTint="@color/material_dynamic_neutral30"
+        android:minHeight="56dp"
+        android:padding="6dp"
+        android:text="ВТБ Банк"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/btnSave"
-        android:text="Save"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="40dp"
+        android:backgroundTint="#A9A3A3"
+        android:text="Save" />
 
-	<TextView
-		android:id="@+id/currentServer"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="16dp"
-		android:text="Current server: -"
-		android:textSize="16sp" />
+    <TextView
+        android:id="@+id/currentServer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="Current server: -"
+        android:textSize="16sp" />
 
-	<TextView
-		android:id="@+id/currentKey"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="16dp"
-		android:text="Current Encryption Key: -"
-		android:textSize="16sp" />
-		
-	<TextView
-		android:id="@+id/currentMinAmount"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="16dp"
-		android:text="Current min amount: -"
-		android:textSize="16sp" />
+    <TextView
+        android:id="@+id/currentKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="Current Encryption Key: -"
+        android:textSize="16sp" />
 
-	<TextView
-		android:id="@+id/currentMaxAmount"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingTop="16dp"
-		android:text="Current max amount: -"
-		android:textSize="16sp" />
+    <TextView
+        android:id="@+id/currentMinAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="Current min amount: -"
+        android:textSize="16sp" />
 
-	<Button
-		android:id="@+id/btnNotif"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="Enable notification access" />
+    <TextView
+        android:id="@+id/currentMaxAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:paddingTop="16dp"
+        android:text="Current max amount: -"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnNotif"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:backgroundTint="#A9A3A3"
+        android:text="Enable notification access" />
 
 </LinearLayout>

@@ -22,18 +22,23 @@ class PaymentPushListener : NotificationListenerService() {
         val extras = sbn.notification.extras ?: return
         val text = extras.getCharSequence("android.text")?.toString() ?: return
 
-        val bank = "ru.sberbankmobile"
-
-        if (pkg != bank) return
+        val prefs = getSharedPreferences("config", MODE_PRIVATE)
+        val enabledBanks = prefs.getStringSet("enabled_banks", emptySet()) ?: emptySet()
+        if (pkg !in enabledBanks) return
 
         val amount = parseAmount(text) ?: return
+        val currentMin = prefs.getString("min_amount", "")?.toDoubleOrNull()?.times(100)?.toLong()
+        val currentMax = prefs.getString("max_amount", "")?.toDoubleOrNull()?.times(100)?.toLong()
+
+        if (currentMin != null && amount < currentMin) return
+        if (currentMax != null && amount > currentMax) return
 
         val event = PaymentEvent(
             amount = amount,
             timestamp = System.currentTimeMillis()
         )
+
         val json = Gson().toJson(event)
-        val prefs = getSharedPreferences("config", MODE_PRIVATE)
         val key = prefs.getString("aes_key", "1234567890123456") ?: "1234567890123456"
         val encrypted = encrypt(json, key)
         val url = prefs.getString("server_url", "") ?: ""
