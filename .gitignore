@@ -9,9 +9,9 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+/release
 /captures
 .externalNativeBuild
 .cxx
 local.properties
-release
-app/release
+ppl-release-key.jks
