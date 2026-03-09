@@ -11,7 +11,7 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="348dp"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:autoSizeTextType="uniform"
         android:text="Payment Push Listener"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -22,7 +22,7 @@
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
-        android:layout_height="43dp"
+        android:layout_height="36dp"
         android:text="Settings:"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
@@ -54,7 +54,6 @@
         android:id="@+id/cbSber"
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:buttonTint="@color/material_dynamic_neutral30"
         android:minHeight="56dp"
         android:padding="6dp"
         android:text="Сбербанк"
@@ -64,7 +63,6 @@
         android:id="@+id/cbTbank"
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:buttonTint="@color/material_dynamic_neutral30"
         android:minHeight="56dp"
         android:padding="6dp"
         android:text="Т-Банк"
@@ -74,7 +72,6 @@
         android:id="@+id/cbAlpha"
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:buttonTint="@color/material_dynamic_neutral30"
         android:minHeight="56dp"
         android:padding="6dp"
         android:text="Альфа Банк"
@@ -84,7 +81,6 @@
         android:id="@+id/cbVTB"
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:buttonTint="@color/material_dynamic_neutral30"
         android:minHeight="56dp"
         android:padding="6dp"
         android:text="ВТБ Банк"
