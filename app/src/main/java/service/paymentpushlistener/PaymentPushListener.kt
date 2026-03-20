@@ -50,7 +50,7 @@ class PaymentPushListener : NotificationListenerService() {
         if (text.isNullOrEmpty()) return null
         try {
             val cleaned = text.replace("[\\s\u00A0]".toRegex(), "")
-            val regex = Regex("(\\d+[.,]?\\d*)\\s*₽")
+            val regex = Regex("(\\d+[.,]?\\d*)\\s*(₽|р\\.?|руб\\.?)", RegexOption.IGNORE_CASE)
             val match = regex.find(cleaned) ?: return null
             val valueStr = match.groupValues[1].replace(",", ".")
             val value = valueStr.toDouble()
