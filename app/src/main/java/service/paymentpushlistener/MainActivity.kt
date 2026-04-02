@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         cbSber.isChecked = "ru.sberbankmobile" in enabledBanks
         cbTbank.isChecked = "com.idamob.tinkoff.android" in enabledBanks
         cbAlpha.isChecked = "ru.alfabank.mobile" in enabledBanks
-        cbOzon.isChecked = "ru.ozon.bank" in enabledBanks
+        cbOzon.isChecked = "ru.ozon.fintech.finance" in enabledBanks
 
         cbSber.setOnCheckedChangeListener { _, checked ->
             if (checked) enabledBanks.add("ru.sberbankmobile") else enabledBanks.remove("ru.sberbankmobile")
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             if (checked) enabledBanks.add("ru.alfabank.mobile") else enabledBanks.remove("ru.alfabank.mobile")
         }
         cbOzon.setOnCheckedChangeListener { _, checked ->
-            if (checked) enabledBanks.add("ru.ozon.bank") else enabledBanks.remove("ru.ozon.bank")
+            if (checked) enabledBanks.add("ru.ozon.fintech.finance") else enabledBanks.remove("ru.ozon.fintech.finance")
         }
 
         btnSave.setOnClickListener {
