@@ -78,12 +78,12 @@
         android:textSize="18sp" />
 
     <CheckBox
-        android:id="@+id/cbVTB"
+        android:id="@+id/cbOzon"
         android:layout_width="match_parent"
         android:layout_height="38dp"
         android:minHeight="56dp"
         android:padding="6dp"
-        android:text="ВТБ Банк"
+        android:text="Озон Банк"
         android:textSize="18sp" />
 
     <Button

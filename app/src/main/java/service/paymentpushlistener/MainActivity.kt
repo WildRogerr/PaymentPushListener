@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cbSber: CheckBox
     private lateinit var cbTbank: CheckBox
     private lateinit var cbAlpha: CheckBox
-    private lateinit var cbVTB: CheckBox
+    private lateinit var cbOzon: CheckBox
     private val enabledBanks = mutableSetOf<String>()
 
 
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         cbSber = findViewById(R.id.cbSber)
         cbTbank = findViewById(R.id.cbTbank)
         cbAlpha = findViewById(R.id.cbAlpha)
-        cbVTB = findViewById(R.id.cbVTB)
+        cbOzon = findViewById(R.id.cbOzon)
 
         val prefs = getSharedPreferences("config", MODE_PRIVATE)
         updateCurrentServer(prefs.getString("server_url", "-") ?: "-")
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         cbSber.isChecked = "ru.sberbankmobile" in enabledBanks
         cbTbank.isChecked = "com.idamob.tinkoff.android" in enabledBanks
         cbAlpha.isChecked = "ru.alfabank.mobile" in enabledBanks
-        cbVTB.isChecked = "ru.vtb.mobilebanking" in enabledBanks
+        cbOzon.isChecked = "ru.ozon.bank" in enabledBanks
 
         cbSber.setOnCheckedChangeListener { _, checked ->
             if (checked) enabledBanks.add("ru.sberbankmobile") else enabledBanks.remove("ru.sberbankmobile")
@@ -68,8 +68,8 @@ class MainActivity : AppCompatActivity() {
         cbAlpha.setOnCheckedChangeListener { _, checked ->
             if (checked) enabledBanks.add("ru.alfabank.mobile") else enabledBanks.remove("ru.alfabank.mobile")
         }
-        cbVTB.setOnCheckedChangeListener { _, checked ->
-            if (checked) enabledBanks.add("ru.vtb.mobilebanking") else enabledBanks.remove("ru.vtb.mobilebanking")
+        cbOzon.setOnCheckedChangeListener { _, checked ->
+            if (checked) enabledBanks.add("ru.ozon.bank") else enabledBanks.remove("ru.ozon.bank")
         }
 
         btnSave.setOnClickListener {
